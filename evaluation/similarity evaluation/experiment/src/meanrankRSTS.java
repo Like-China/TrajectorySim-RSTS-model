@@ -12,7 +12,7 @@ public class meanrankRSTS {
     final String[] pnums = Settings.pnums;
 
     public String varyR1() {
-        System.out.println("变化r1下的mean rank 变化");
+        System.out.println("vary r1: meanrank");
         long timeSum = 0;
         ArrayList<Float> meanRanks = new ArrayList<>();
         for (String r1 : rates) {
@@ -22,7 +22,7 @@ public class meanrankRSTS {
             TrajectoryVecLoader db_stream = new TrajectoryVecLoader(db_path, dbNum);
             ArrayList<ArrayList<Float>> q = q_stream.read();
             ArrayList<ArrayList<Float>> db = db_stream.read();
-            // 计算mean rank
+            // calculate mean rank
             long time1 = System.currentTimeMillis();
             ArrayList<Integer> ranks = meanrank(q, db);
             float rankSum = 0f;
@@ -39,7 +39,7 @@ public class meanrankRSTS {
     }
 
     public String varyR2() {
-        System.out.println("变化r1下的mean rank 变化");
+        System.out.println("vary r2: meanrank");
         long timeSum = 0;
         ArrayList<Float> meanRanks = new ArrayList<>();
         for (String r1 : rates) {
@@ -66,7 +66,7 @@ public class meanrankRSTS {
     }
 
     public String varyNum() {
-        System.out.println("变化P Size的mean rank 变化");
+        System.out.println("vary the size of P: meanrank");
         long timeSum = 0;
         ArrayList<Float> meanRanks = new ArrayList<>();
         for (String pnum : pnums) {
@@ -89,13 +89,12 @@ public class meanrankRSTS {
             timeSum += (time2 - time1);
         }
         System.out.println(meanRanks);
-        return "vary num->mean rank " + meanRanks;
+        return "vary num->mean rank " + meanRanks + " CPU time: " + timeSum;
     }
 
-    // 计算一组查询轨迹集合到db集合的mean rank
     public ArrayList<Integer> meanrank(ArrayList<ArrayList<Float>> q, ArrayList<ArrayList<Float>> db) {
         ArrayList<Integer> ranks = new ArrayList<>();
-        // 计算两组轨迹集合两两之间的距离并排序
+        // Calculate the distance between two sets of trajectories and sort them
         for (int i = 0; i < q.size(); i++) {
             ArrayList<Float> query_traj = q.get(i);
             ArrayList<Float> dists = new ArrayList<>();
@@ -104,12 +103,11 @@ public class meanrankRSTS {
                 float edr_dist = Distance.edulidean(query_traj, db_traj);
                 dists.add(edr_dist);
             }
-            // 每当一个query到所有db距离计算完毕，对其进行排序
-            // 获取与twin的距离
+            // Sort a query every time the distance to all db's is calculated, get its twin
+            // distance
             float twin_dist = dists.get(i);
-            // 对距离排序
             Collections.sort(dists);
-            // 记录twin的排名
+            // get the ranking of its twin
             int rank = dists.indexOf(twin_dist) + 1;
             ranks.add(rank);
         }
